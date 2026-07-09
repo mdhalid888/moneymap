@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { User } from '../models/User';
 import { sendEmail } from '../utils/sendEmail';
 
@@ -128,17 +129,101 @@ export const forgotPassword = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Email is required' });
     }
     
-    // Simulate lookup
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: 'User with this email does not exist' });
     }
 
-    // Return a mock reset success message per requirements
-    res.json({
-      message: 'Password reset link simulated. (For demo purposes: You can update your password in Settings after logging in!)'
+    // Generate a secure random token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    
+    // Store token and expiration (valid for 1 hour)
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+    await user.save();
+
+    // Client URL
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    const resetLink = `${clientUrl}/reset-password/${resetToken}`;
+
+    // Construct HTML email body
+    const emailHtml = `
+      <div style="font-family: 'Outfit', 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #edf2f7; border-radius: 16px; background-color: #ffffff;">
+        <div style="text-align: center; border-bottom: 1px solid #edf2f7; padding-bottom: 20px;">
+          <h2 style="color: #2563eb; margin: 0; font-size: 24px; font-weight: bold; letter-spacing: -0.025em;">MoneyMap</h2>
+          <p style="color: #64748b; margin: 4px 0 0 0; font-size: 14px;">Your Path to Financial Freedom</p>
+        </div>
+        
+        <div style="padding: 30px 20px; color: #1e293b;">
+          <h3 style="margin-top: 0; font-size: 20px; font-weight: 700; color: #0f172a;">Password Reset Request 🔑</h3>
+          <p style="font-size: 15px; line-height: 1.6; color: #334155;">
+            Hello ${user.name},
+          </p>
+          <p style="font-size: 15px; line-height: 1.6; color: #334155;">
+            We received a request to reset the password for your MoneyMap account. Click the button below to configure a new password. This link is valid for 1 hour.
+          </p>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetLink}" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; font-weight: bold; border-radius: 10px; font-size: 14px; box-shadow: 0 4px 12px rgba(37,99,235,0.2);">
+              Reset Password
+            </a>
+          </div>
+
+          <p style="font-size: 13px; line-height: 1.6; color: #64748b;">
+            If you did not make this request, you can safely ignore this email. Your password will remain unchanged.
+          </p>
+          <hr style="border: 0; border-top: 1px solid #edf2f7; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #94a3b8; word-break: break-all;">
+            If the button above does not work, copy and paste this URL into your browser: <br/>
+            <a href="${resetLink}" style="color: #2563eb;">${resetLink}</a>
+          </p>
+        </div>
+
+        <div style="border-top: 1px solid #edf2f7; padding-top: 20px; text-align: center; font-size: 12px; color: #94a3b8;">
+          &copy; 2026 MoneyMap. Secure Data Vault Encryption Active.
+        </div>
+      </div>
+    `;
+
+    // Send email
+    await sendEmail({
+      to: email,
+      subject: 'MoneyMap – Reset Your Password 🔑',
+      html: emailHtml
     });
+
+    res.json({ message: 'Password reset link sent to your email address.' });
   } catch (error) {
+    console.error('Forgot password error:', error);
     res.status(500).json({ message: 'Server error during password reset request' });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ message: 'Token and password are required' });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Password reset token is invalid or has expired.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: 'Your password has been successfully reset. Please log in.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ message: 'Server error during password reset execution' });
   }
 };

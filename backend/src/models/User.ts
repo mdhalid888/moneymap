@@ -27,6 +27,14 @@ const userSchema = new Schema(
       enum: ['light', 'dark'],
       default: 'light',
     },
+    resetPasswordToken: {
+      type: String,
+      default: null,
+    },
+    resetPasswordExpires: {
+      type: Date,
+      default: null,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

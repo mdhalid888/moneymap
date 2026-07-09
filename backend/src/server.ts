@@ -21,6 +21,7 @@ app.use(express.json());
 app.post('/api/auth/register', authController.register);
 app.post('/api/auth/login', authController.login);
 app.post('/api/auth/forgot-password', authController.forgotPassword);
+app.post('/api/auth/reset-password', authController.resetPassword);
 
 // 2. User configurations (all protected)
 app.get('/api/users/me', auth, userController.getMe);
