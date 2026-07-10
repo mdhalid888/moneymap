@@ -326,10 +326,10 @@ const Dashboard: React.FC = () => {
       {/* Dashboard Top Branding Header */}
       <div className="flex items-center justify-between border-b border-slate-100 dark:border-darkBorder pb-5">
         <div className="flex items-center gap-3">
-          {/* Hamburger Menu (visible on mobile/tablet < 1024px) */}
+          {/* Hamburger Menu (visible on all screen sizes) */}
           <button
             onClick={() => setIsSidebarMobileOpen(true)}
-            className="p-2 -ml-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-darkCard lg:hidden cursor-pointer"
+            className="p-2 -ml-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-darkCard cursor-pointer"
             title="Open Menu"
           >
             <FiMenu className="w-6 h-6" />
@@ -346,6 +346,11 @@ const Dashboard: React.FC = () => {
             </div>
             <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
               Money<span className="text-blue-500">Map</span>
+            </span>
+            
+            {/* Quick Date Display - placed directly after the MoneyMap name */}
+            <span className="hidden sm:inline-block text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-darkCard/40 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-darkBorder/40">
+              {new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
             </span>
           </div>
         </div>
@@ -365,21 +370,13 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Header welcome banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl md:text-[36px] font-extrabold text-slate-900 dark:text-white leading-tight">
-            Welcome back,<br />
-            {user?.name ? user.name : 'Mohamed'} 👋
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-            Here's your current financial summary and insights.
-          </p>
-        </div>
-        
-        {/* Quick Date Display */}
-        <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white dark:bg-darkCard border border-slate-100 dark:border-darkBorder shadow-premium text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-300 self-start md:self-center shrink-0">
-          <span>{new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span>
-        </div>
+      <div>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
+          Welcome back, {user?.name ? user.name : 'Mohamed'} 👋
+        </h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+          Here's your current financial summary and insights.
+        </p>
       </div>
 
       {/* First Time User Setup Banner */}

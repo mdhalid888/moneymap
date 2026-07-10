@@ -45,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onOpenSettings, isMobileOpen, setIsMo
 
   const sidebarClasses = `
     fixed inset-y-0 left-0 z-40 w-64 border-r transition-transform duration-300 transform
-    ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+    ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
     bg-white border-slate-100 text-slate-800
     dark:bg-darkSidebar dark:border-darkBorder dark:text-slate-200
     flex flex-col justify-between
@@ -53,10 +53,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onOpenSettings, isMobileOpen, setIsMo
 
   return (
     <>
-      {/* Mobile Backdrop */}
+      {/* Backdrop (closes sidebar when clicked) */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -91,10 +91,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onOpenSettings, isMobileOpen, setIsMo
                 )}
               </button>
 
-              {/* Close Button (mobile only) */}
+              {/* Close Button */}
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="p-2 rounded-xl border border-slate-200 dark:border-darkBorder text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-darkCard hover:text-slate-800 dark:hover:text-white transition-all shadow-sm lg:hidden cursor-pointer"
+                className="p-2 rounded-xl border border-slate-200 dark:border-darkBorder text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-darkCard hover:text-slate-800 dark:hover:text-white transition-all shadow-sm cursor-pointer"
                 title="Close Menu"
               >
                 <FiX className="w-4 h-4" />

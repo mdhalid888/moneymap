@@ -47,10 +47,10 @@ const ProtectedLayout: React.FC = () => {
       />
 
       {/* Main Content Layout */}
-      <div className="lg:pl-64 min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col">
         {/* Mobile Header Bar */}
         {!isDashboard && (
-          <header className="h-16 border-b border-slate-100 dark:border-darkBorder bg-white dark:bg-darkSidebar px-6 flex items-center justify-between lg:hidden shrink-0">
+          <header className="h-16 border-b border-slate-100 dark:border-darkBorder bg-white dark:bg-darkSidebar px-6 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsSidebarMobileOpen(true)}
