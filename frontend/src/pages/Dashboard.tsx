@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
-import { FiPlus, FiEdit2, FiTrash2, FiDollarSign, FiTrendingUp, FiTrendingDown, FiPieChart, FiX, FiCheck, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiDollarSign, FiTrendingUp, FiTrendingDown, FiPieChart, FiX, FiCheck, FiDownload, FiMenu, FiSun, FiMoon } from 'react-icons/fi';
+import logo from '../assets/logo.png';
 
 interface ExpenseType {
   _id: string;
@@ -16,7 +18,8 @@ const CATEGORIES = ['Food', 'Rent', 'Utilities', 'Entertainment', 'Travel', 'Sho
 const CURRENCIES = ['₹', '$', '€', '£', '¥'];
 
 const Dashboard: React.FC = () => {
-  const { user, updateUserIncome } = useAuth();
+  const { user, updateUserIncome, toggleTheme } = useAuth();
+  const { setIsSidebarMobileOpen } = useOutletContext<{ setIsSidebarMobileOpen: (open: boolean) => void }>();
   
   // States
   const [expenses, setExpenses] = useState<ExpenseType[]>([]);
@@ -320,19 +323,61 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 pb-12">
+      {/* Dashboard Top Branding Header */}
+      <div className="flex items-center justify-between border-b border-slate-100 dark:border-darkBorder pb-5">
+        <div className="flex items-center gap-3">
+          {/* Hamburger Menu (visible on mobile/tablet < 1024px) */}
+          <button
+            onClick={() => setIsSidebarMobileOpen(true)}
+            className="p-2 -ml-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-darkCard lg:hidden cursor-pointer"
+            title="Open Menu"
+          >
+            <FiMenu className="w-6 h-6" />
+          </button>
+          
+          {/* Logo and Brand Name */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 overflow-hidden relative rounded-xl bg-black border border-slate-800 dark:border-darkBorder flex items-center justify-center shadow-sm shrink-0">
+              <img 
+                src={logo} 
+                alt="Logo Icon" 
+                className="w-[140%] h-auto max-w-none absolute top-[-2px] left-1/2 -translate-x-1/2 object-contain" 
+              />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Money<span className="text-blue-500">Map</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="p-2.5 rounded-xl border border-slate-200 dark:border-darkBorder text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-darkCard hover:text-slate-800 dark:hover:text-white transition-all shadow-sm cursor-pointer"
+          title="Toggle Theme"
+        >
+          {user?.theme === 'dark' ? (
+            <FiSun className="w-5 h-5 text-amber-500" />
+          ) : (
+            <FiMoon className="w-5 h-5 text-blue-500" />
+          )}
+        </button>
+      </div>
+
       {/* Header welcome banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-[36px] font-extrabold text-slate-900 dark:text-white leading-tight">
-            Welcome back, {user?.name ? user.name : 'Mohamed'} 👋
+            Welcome back,<br />
+            {user?.name ? user.name : 'Mohamed'} 👋
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
             Here's your current financial summary and insights.
           </p>
         </div>
         
         {/* Quick Date Display */}
-        <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white dark:bg-darkCard border border-slate-100 dark:border-darkBorder shadow-premium text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-300">
+        <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white dark:bg-darkCard border border-slate-100 dark:border-darkBorder shadow-premium text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-300 self-start md:self-center shrink-0">
           <span>{new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span>
         </div>
       </div>

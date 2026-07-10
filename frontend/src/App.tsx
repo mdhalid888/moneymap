@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
 import SettingsModal from './components/SettingsModal';
@@ -20,6 +20,8 @@ const ProtectedLayout: React.FC = () => {
   const { token, loading } = useAuth();
   const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const location = useLocation();
+  const isDashboard = location.pathname === '/';
 
   if (loading) {
     return (
@@ -45,25 +47,27 @@ const ProtectedLayout: React.FC = () => {
       />
 
       {/* Main Content Layout */}
-      <div className="md:pl-64 min-h-screen flex flex-col">
+      <div className="lg:pl-64 min-h-screen flex flex-col">
         {/* Mobile Header Bar */}
-        <header className="h-16 border-b border-slate-100 dark:border-darkBorder bg-white dark:bg-darkSidebar px-6 flex items-center justify-between md:hidden shrink-0">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsSidebarMobileOpen(true)}
-              className="p-2 -ml-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-darkCard"
-            >
-              <FiMenu className="w-6 h-6" />
-            </button>
-            <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
-              Money<span className="text-blue-500">Map</span>
-            </span>
-          </div>
-        </header>
+        {!isDashboard && (
+          <header className="h-16 border-b border-slate-100 dark:border-darkBorder bg-white dark:bg-darkSidebar px-6 flex items-center justify-between lg:hidden shrink-0">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsSidebarMobileOpen(true)}
+                className="p-2 -ml-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-darkCard cursor-pointer"
+              >
+                <FiMenu className="w-6 h-6" />
+              </button>
+              <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Money<span className="text-blue-500">Map</span>
+              </span>
+            </div>
+          </header>
+        )}
 
         {/* View Wrapper */}
-        <main className="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto">
-          <Outlet />
+        <main className="flex-1 p-4 sm:p-6 lg:p-10 max-w-7xl w-full mx-auto">
+          <Outlet context={{ setIsSidebarMobileOpen }} />
         </main>
       </div>
 
